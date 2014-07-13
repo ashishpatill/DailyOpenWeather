@@ -84,7 +84,19 @@
     dayArray = [[NSArray alloc]init];
     if ([type isEqualToString:@"By_name"]) {
         if (cityName) {
-            [self parseData:cityName];
+            
+            //------------------ URL Formatting start ---------------------------------//
+            // remove spaces at end and beginning of string
+            NSString* noSpaces =
+            [[self.cityName componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]]
+             componentsJoinedByString:@""];
+            
+            // replace places between words with '%20' (URL Formatting)
+            noSpaces = [noSpaces stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
+            
+            //------------------ URL Formatting end ---------------------------------//
+            
+            [self parseData:noSpaces];
         }
         else
         {
@@ -107,18 +119,8 @@
 
 -(void)parseData:(NSString *)city
 {
-    //------------------ URL Formatting start ---------------------------------//
-    // remove spaces at end and beginning of string
-    NSString* noSpaces =
-    [[city componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]]
-     componentsJoinedByString:@""];
-    
-    // replace places between words with '%20' (URL Formatting)
-    noSpaces = [noSpaces stringByReplacingOccurrencesOfString:@" " withString:@"%20"];
-    
-    //------------------ URL Formatting end ---------------------------------//
 
-    NSURL *weatherURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://api.openweathermap.org/data/2.5/forecast/daily?q=%@&cnt=14&units=metric&APPID=c3a2030a588d7d5edbc65748db8a4422",noSpaces]];
+    NSURL *weatherURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://api.openweathermap.org/data/2.5/forecast/daily?q=%@&cnt=14&units=metric&APPID=c3a2030a588d7d5edbc65748db8a4422",city]];
     
     NSData *jsonData = [NSData dataWithContentsOfURL:weatherURL];
     
@@ -158,11 +160,18 @@
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return 1;
+    if (dayArray.count==0) {
+        return 0;
+    }
+    else
+    {
+        return 1;
+    }
 }
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
+    
     return 14;
 }
 
@@ -175,6 +184,8 @@
     {
         cell = [[CustomCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:cellIdentifier];
     }
+    
+    if (dayArray.count==0) {
 
     NSDictionary *dayDict = [dayArray objectAtIndex:indexPath.row];
     DataModel *dataObject = [[DataModel alloc]init];
@@ -200,7 +211,7 @@
     cell.forecastLabel.text = dataObject.description;
     cell.tempLabel.text = [NSString stringWithFormat:@"%@ C/%@ C",dataObject.max,dataObject.min];
     cell.dayNumber.text = [dateArray objectAtIndex:indexPath.row];
-    
+    }
     return cell;
 }
 
@@ -215,6 +226,17 @@
     [locationManager startUpdatingLocation];
     //------
 }
+
+# pragma mark DELEGATE METHODS
+
+- (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
+{
+    NSLog(@"didFailWithError: %@", error);
+    UIAlertView *errorAlert = [[UIAlertView alloc]
+                               initWithTitle:@"Error" message:@"Failed to Get Your Location" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+    [errorAlert show];
+}
+
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
@@ -234,7 +256,7 @@
              NSString *Country = [[NSString alloc]initWithString:placemark.country];
              NSString *CountryArea = [NSString stringWithFormat:@"%@, %@", Area,Country];
              [self parseData:CountryArea];
-             NSLog(@"%@",Area);
+             NSLog(@"area %@",Area);
          }
          else
          {
