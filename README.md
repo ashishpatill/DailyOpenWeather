@@ -18,12 +18,21 @@ Features:-
 Looking forward to add more functionality soon. Share it if you like.
 
 
-Complete open weather app:- Data model\n 
-							Parsing json response and populating data to table \n
-							location manager integration \n 
-							reverse geo coding to get current city \n
-							Custom tableView Cell \n
-							URL formatting \n
-							Error handling for response \n
-							Background threads to fetch image data \n
-							Well documented and formatted code \n
+What you will learn from    
+this tutorial:-				Data model,
+							
+							Parsing json response and populating data to table,
+							
+							location manager integration,
+							
+							reverse geo coding to get current city,
+							
+							Custom tableView Cell,
+							
+							URL formatting,
+							
+							Error handling for response,
+							
+							Background threads to fetch image data,
+							
+							Well documented and formatted code.
